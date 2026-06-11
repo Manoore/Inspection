@@ -5,6 +5,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
+import * as XLSX from "xlsx";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { supabase } from "@/lib/supabase";
@@ -27,6 +30,34 @@ export default function ChecklistsScreen() {
   const [draft,        setDraft]        = useState<DraftChecklist>(BLANK);
   const [newItemText,  setNewItemText]  = useState("");
   const [saving,       setSaving]       = useState(false);
+
+  const importFromExcel = async () => {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: [
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-excel",
+        "*/*",
+      ],
+      copyToCacheDirectory: true,
+    });
+    if (result.canceled) return;
+    const file = result.assets[0];
+    try {
+      const b64 = await FileSystem.readAsStringAsync(file.uri, { encoding: FileSystem.EncodingType.Base64 });
+      const wb  = XLSX.read(b64, { type: "base64" });
+      const ws  = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json<string[]>(ws, { header: 1 });
+      const items: DraftItem[] = rows
+        .filter((r) => r[0]?.toString().trim())
+        .map((r, i) => ({ id: `xl-${Date.now()}-${i}`, text: r[0].toString().trim(), required: true }));
+      if (items.length === 0) { Alert.alert("No items found", "Column A must contain checklist items."); return; }
+      setDraft((d) => ({ ...d, items: [...d.items, ...items] }));
+      setCreateModal(true);
+      Alert.alert("Imported", `${items.length} items loaded from Excel. Fill in name & service line, then save.`);
+    } catch {
+      Alert.alert("Error", "Could not parse the Excel file. Make sure items are in column A.");
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -100,14 +131,26 @@ export default function ChecklistsScreen() {
           <Text style={{ fontSize: 22, fontWeight: "800", color: COLORS.gray900 }}>Checklists</Text>
           <Text style={{ fontSize: 13, color: COLORS.gray400, marginTop: 1 }}>{checklists.length} templates</Text>
         </View>
-        <TouchableOpacity
-          onPress={() => setCreateModal(true)}
-          style={{ flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: COLORS.brand, borderRadius: 10, paddingHorizontal: 16, paddingVertical: 10 }}
-          activeOpacity={0.85}
-        >
-          <Ionicons name="add" size={18} color="#FFF" />
-          <Text style={{ color: "#FFF", fontWeight: "700", fontSize: 13 }}>New</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          <TouchableOpacity
+            onPress={importFromExcel}
+            style={{ flexDirection: "row", alignItems: "center", gap: 6,
+              borderWidth: 1.5, borderColor: COLORS.brand, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10 }}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="document-attach-outline" size={16} color={COLORS.brand} />
+            <Text style={{ color: COLORS.brand, fontWeight: "700", fontSize: 13 }}>Excel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setCreateModal(true)}
+            style={{ flexDirection: "row", alignItems: "center", gap: 6,
+              backgroundColor: COLORS.brand, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10 }}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="add" size={18} color="#FFF" />
+            <Text style={{ color: "#FFF", fontWeight: "700", fontSize: 13 }}>New</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView

@@ -135,7 +135,41 @@ export default function LoginScreen() {
             />
           </View>
 
-          <Text style={{ color: "rgba(255,255,255,0.45)", textAlign: "center", marginTop: 20, fontSize: 12 }}>
+          {/* Demo quick-login */}
+          <View style={{ marginTop: 28 }}>
+            <Text style={{ color: "rgba(255,255,255,0.5)", textAlign: "center", fontSize: 11,
+              fontWeight: "600", letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>
+              Demo Access
+            </Text>
+            <View style={{ gap: 8 }}>
+              {[
+                { label: "Admin",            email: "admin@test.com",   icon: "shield-checkmark-outline" as const, color: "#FFF" },
+                { label: "Field Inspector",  email: "field@test.com",   icon: "clipboard-outline" as const,        color: "#93C5FD" },
+                { label: "Auditor",          email: "auditor@test.com", icon: "search-outline" as const,           color: "#6EE7B7" },
+              ].map((d) => (
+                <TouchableOpacity key={d.label}
+                  onPress={async () => {
+                    setLoading(true);
+                    await signIn(d.email, "password123");
+                    setLoading(false);
+                  }}
+                  disabled={loading}
+                  style={{ flexDirection: "row", alignItems: "center", gap: 10,
+                    backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 12,
+                    paddingHorizontal: 16, paddingVertical: 13,
+                    borderWidth: 1, borderColor: "rgba(255,255,255,0.15)" }}
+                  activeOpacity={0.75}>
+                  <Ionicons name={d.icon} size={18} color={d.color} />
+                  <Text style={{ flex: 1, fontSize: 14, fontWeight: "600", color: d.color }}>
+                    {d.label}
+                  </Text>
+                  <Ionicons name="arrow-forward" size={16} color={d.color} />
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <Text style={{ color: "rgba(255,255,255,0.3)", textAlign: "center", marginTop: 20, fontSize: 11 }}>
             ClinicOps • Confidential
           </Text>
 
