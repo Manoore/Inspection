@@ -2,7 +2,7 @@ import {
   MOCK_USERS, MOCK_LOCATIONS, MOCK_CHECKLISTS, MOCK_CHECKLIST_ITEMS,
   MOCK_HEALTH_SCORES, MOCK_INSPECTIONS, MOCK_CORRECTIVE_ACTIONS,
   MOCK_TRAINING_MODULES, MOCK_TRAINING_COMPLETIONS, MOCK_INQUIRIES,
-  MOCK_ESCALATION_CONFIG,
+  MOCK_ESCALATION_CONFIG, MOCK_INSPECTION_RESPONSES,
 } from "./mockData";
 
 // ── Table registry ────────────────────────────────────────────────────────────
@@ -14,7 +14,7 @@ const TABLE_DATA: Record<string, any[]> = {
   checklist_items:      MOCK_CHECKLIST_ITEMS,
   health_scores:        MOCK_HEALTH_SCORES,
   inspections:          MOCK_INSPECTIONS,
-  inspection_responses: [],
+  inspection_responses: MOCK_INSPECTION_RESPONSES,
   corrective_actions:   MOCK_CORRECTIVE_ACTIONS,
   training_modules:     MOCK_TRAINING_MODULES,
   training_completions: MOCK_TRAINING_COMPLETIONS,
@@ -64,6 +64,37 @@ class QueryBuilder {
   }
   limit(n: number) { this._limitN = n; return this; }
   single()         { this._single = true; return this; }
+
+  private resolveJoins(rows: any[]): any[] {
+    const pattern = /(\w+)\(([^)]+)\)/g;
+    const joins: { table: string; cols: string[] }[] = [];
+    let m: RegExpExecArray | null;
+    while ((m = pattern.exec(this._selectCols)) !== null) {
+      joins.push({ table: m[1], cols: m[2].split(",").map((c) => c.trim()) });
+    }
+    if (!joins.length) return rows;
+    return rows.map((row) => {
+      const out = { ...row };
+      for (const join of joins) {
+        const related = TABLE_DATA[join.table] ?? [];
+        // Try common FK names to find the linked row
+        const fkCandidates = [
+          `${join.table.replace(/s$/, "")}_id`,  // locations→location_id, users→user_id
+          "item_id",       // checklist_items linked via item_id
+          "inspector_id",  // users linked via inspector_id on inspections
+        ];
+        let found: any = null;
+        for (const fk of fkCandidates) {
+          if (row[fk]) { found = related.find((r: any) => r.id === row[fk]); if (found) break; }
+        }
+        if (!found) { out[join.table] = null; continue; }
+        const picked: Record<string, any> = {};
+        join.cols.forEach((col) => { picked[col] = found[col]; });
+        out[join.table] = picked;
+      }
+      return out;
+    });
+  }
 
   private applyFilters(rows: any[]): any[] {
     return rows.filter((row) =>
@@ -116,8 +147,7 @@ class QueryBuilder {
     }
     if (this._limitN != null) rows = rows.slice(0, this._limitN);
 
-    // join-like: if select contains nested keys (e.g. "*, location:locations(name)")
-    // just return flat rows — good enough for mock
+    rows = this.resolveJoins(rows);
     const data = this._single ? (rows[0] ?? null) : rows;
     return resolve({ data, error: null });
   }

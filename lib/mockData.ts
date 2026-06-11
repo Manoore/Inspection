@@ -262,6 +262,48 @@ export const MOCK_TRAINING_COMPLETIONS: TrainingCompletion[] = [
   { id: "tc-4", user_id: "user-field-1",   module_id: "tm-4", location_id: "loc-3", completed_by_name: "David Nguyen", completed_at: "2026-03-10T00:00:00Z", cert_expires_at: "2027-03-10T00:00:00Z", score: 96 },
 ];
 
+// ── Inspection Responses ─────────────────────────────────────────────────────
+// Each row mirrors what the field inspector recorded per checklist item.
+// checklist_items is pre-embedded so the mock join resolver can return it.
+
+export const MOCK_INSPECTION_RESPONSES = [
+  // ins-1: West Market · Jun 9 · 88% (7 pass, 1 fail out of 8)
+  { id: "r-1-1", inspection_id: "ins-1", item_id: "item-1", passed: true,  value: "41°F",  notes: undefined, photo_url: undefined, checklist_items: { label: "Medication fridge temp 35–46°F",         type: "temperature" } },
+  { id: "r-1-2", inspection_id: "ins-1", item_id: "item-2", passed: false, value: "48°F",  notes: "Slightly above range — reported to facility manager, corrective steps initiated", photo_url: undefined, checklist_items: { label: "Vaccine fridge temp 35–46°F",            type: "temperature" } },
+  { id: "r-1-3", inspection_id: "ins-1", item_id: "item-3", passed: true,  value: "Pass",  notes: undefined, photo_url: undefined, checklist_items: { label: "PPE stock (gloves, masks, gowns) adequate", type: "pass_fail"   } },
+  { id: "r-1-4", inspection_id: "ins-1", item_id: "item-4", passed: true,  value: "Pass",  notes: undefined, photo_url: undefined, checklist_items: { label: "Exam rooms cleaned & disinfected",         type: "pass_fail"   } },
+  { id: "r-1-5", inspection_id: "ins-1", item_id: "item-5", passed: true,  value: "Pass",  notes: undefined, photo_url: undefined, checklist_items: { label: "Sharps containers <¾ full",                 type: "pass_fail"   } },
+  { id: "r-1-6", inspection_id: "ins-1", item_id: "item-6", passed: true,  value: "Yes",   notes: undefined, photo_url: undefined, checklist_items: { label: "Autoclave log current (last cycle <24 hrs)", type: "yes_no"      } },
+  { id: "r-1-7", inspection_id: "ins-1", item_id: "item-7", passed: true,  value: "Pass",  notes: undefined, photo_url: undefined, checklist_items: { label: "Lab equipment calibration stickers current",  type: "pass_fail"   } },
+  { id: "r-1-8", inspection_id: "ins-1", item_id: "item-8", passed: true,  value: "Pass",  notes: undefined, photo_url: undefined, checklist_items: { label: "EKG machine functional test passed",         type: "pass_fail"   } },
+
+  // ins-2: West Market · Jun 5 · 75% (6 pass, 2 fail out of 8)
+  { id: "r-2-1", inspection_id: "ins-2", item_id: "item-1", passed: false, value: "50°F",  notes: "Door seal may be failing — corrective action raised", photo_url: undefined, checklist_items: { label: "Medication fridge temp 35–46°F",         type: "temperature" } },
+  { id: "r-2-2", inspection_id: "ins-2", item_id: "item-2", passed: true,  value: "38°F",  notes: undefined, photo_url: undefined, checklist_items: { label: "Vaccine fridge temp 35–46°F",            type: "temperature" } },
+  { id: "r-2-3", inspection_id: "ins-2", item_id: "item-3", passed: true,  value: "Pass",  notes: undefined, photo_url: undefined, checklist_items: { label: "PPE stock (gloves, masks, gowns) adequate", type: "pass_fail"   } },
+  { id: "r-2-4", inspection_id: "ins-2", item_id: "item-4", passed: true,  value: "Pass",  notes: undefined, photo_url: undefined, checklist_items: { label: "Exam rooms cleaned & disinfected",         type: "pass_fail"   } },
+  { id: "r-2-5", inspection_id: "ins-2", item_id: "item-5", passed: true,  value: "Pass",  notes: undefined, photo_url: undefined, checklist_items: { label: "Sharps containers <¾ full",                 type: "pass_fail"   } },
+  { id: "r-2-6", inspection_id: "ins-2", item_id: "item-6", passed: true,  value: "Yes",   notes: undefined, photo_url: undefined, checklist_items: { label: "Autoclave log current (last cycle <24 hrs)", type: "yes_no"      } },
+  { id: "r-2-7", inspection_id: "ins-2", item_id: "item-7", passed: false, value: "Fail",  notes: "Calibration sticker on centrifuge expired 2026-05-20", photo_url: undefined, checklist_items: { label: "Lab equipment calibration stickers current",  type: "pass_fail"   } },
+  { id: "r-2-8", inspection_id: "ins-2", item_id: "item-8", passed: true,  value: "Pass",  notes: undefined, photo_url: undefined, checklist_items: { label: "EKG machine functional test passed",         type: "pass_fail"   } },
+
+  // ins-3: Fairlawn · Jun 8 · 62% (5 pass, 3 fail out of 8)
+  { id: "r-3-1", inspection_id: "ins-3", item_id: "item-1", passed: true,  value: "43°F",  notes: undefined, photo_url: undefined, checklist_items: { label: "Medication fridge temp 35–46°F",         type: "temperature" } },
+  { id: "r-3-2", inspection_id: "ins-3", item_id: "item-2", passed: true,  value: "40°F",  notes: undefined, photo_url: undefined, checklist_items: { label: "Vaccine fridge temp 35–46°F",            type: "temperature" } },
+  { id: "r-3-3", inspection_id: "ins-3", item_id: "item-3", passed: false, value: "Fail",  notes: "Gloves (S) and N95 masks below reorder threshold", photo_url: undefined, checklist_items: { label: "PPE stock (gloves, masks, gowns) adequate", type: "pass_fail"   } },
+  { id: "r-3-4", inspection_id: "ins-3", item_id: "item-4", passed: true,  value: "Pass",  notes: undefined, photo_url: undefined, checklist_items: { label: "Exam rooms cleaned & disinfected",         type: "pass_fail"   } },
+  { id: "r-3-5", inspection_id: "ins-3", item_id: "item-5", passed: false, value: "Fail",  notes: "Container in Exam Room 3 is >¾ full — needs immediate swap", photo_url: undefined, checklist_items: { label: "Sharps containers <¾ full",                 type: "pass_fail"   } },
+  { id: "r-3-6", inspection_id: "ins-3", item_id: "item-6", passed: true,  value: "Yes",   notes: undefined, photo_url: undefined, checklist_items: { label: "Autoclave log current (last cycle <24 hrs)", type: "yes_no"      } },
+  { id: "r-3-7", inspection_id: "ins-3", item_id: "item-7", passed: false, value: "Fail",  notes: "Centrifuge sticker expired 2026-05-15, blood analyzer due 2026-06-01", photo_url: undefined, checklist_items: { label: "Lab equipment calibration stickers current",  type: "pass_fail"   } },
+  { id: "r-3-8", inspection_id: "ins-3", item_id: "item-8", passed: true,  value: "Pass",  notes: undefined, photo_url: undefined, checklist_items: { label: "EKG machine functional test passed",         type: "pass_fail"   } },
+
+  // ins-4: Beachwood Occ Health · Jun 7 · 50% (2 pass, 2 fail out of 4)
+  { id: "r-4-1", inspection_id: "ins-4", item_id: "item-9",  passed: false, value: "Fail", notes: "DOT kits expired 2026-06-01 — emergency replacement ordered", photo_url: undefined, checklist_items: { label: "DOT drug test kits not expired",                type: "pass_fail" } },
+  { id: "r-4-2", inspection_id: "ins-4", item_id: "item-10", passed: false, value: "No",   notes: "Last calibrated 2025-05-10 — 13 months ago, overdue by 1 month", photo_url: undefined, checklist_items: { label: "Breathalyzer calibration current (<12 months)", type: "yes_no"    } },
+  { id: "r-4-3", inspection_id: "ins-4", item_id: "item-11", passed: true,  value: "Pass", notes: undefined, photo_url: undefined, checklist_items: { label: "Chain-of-custody forms stocked",              type: "pass_fail" } },
+  { id: "r-4-4", inspection_id: "ins-4", item_id: "item-12", passed: true,  value: "Yes",  notes: undefined, photo_url: undefined, checklist_items: { label: "BWC case logs up to date",                    type: "yes_no"    } },
+];
+
 // ── Inquiries ─────────────────────────────────────────────────────────────────
 
 export const MOCK_INQUIRIES: Inquiry[] = [
