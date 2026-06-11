@@ -230,7 +230,8 @@ export default function LocationsScreen() {
         data={REGIONS}
         keyExtractor={(r) => r}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 20, gap: 8, marginBottom: 12 }}
+        style={{ flexGrow: 0, flexShrink: 0 }}
+        contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingBottom: 12 }}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => setRegion(item)}
