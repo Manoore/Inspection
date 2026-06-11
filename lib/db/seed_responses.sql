@@ -127,47 +127,51 @@ BEGIN
   DELETE FROM public.inspection_responses;
 
   IF ins_88 IS NOT NULL THEN
-    INSERT INTO public.inspection_responses (inspection_id, item_id, value, passed, notes) VALUES
-      (ins_88, item_med_fridge,   '41°F', true,  null),
-      (ins_88, item_vac_fridge,   '48°F', false, 'Slightly above range — reported to facility manager'),
-      (ins_88, item_ppe,          'Pass', true,  null),
-      (ins_88, item_exam_rooms,   'Pass', true,  null),
-      (ins_88, item_sharps,       'Pass', true,  null),
-      (ins_88, item_autoclave,    'Yes',  true,  null),
-      (ins_88, item_lab_cal,      'Pass', true,  null),
-      (ins_88, item_ekg,          'Pass', true,  null);
+    INSERT INTO public.inspection_responses (id, inspection_id, item_id, value, passed, notes) VALUES
+      (gen_random_uuid(), ins_88, item_med_fridge,   '41°F', true,  null),
+      (gen_random_uuid(), ins_88, item_vac_fridge,   '48°F', false, 'Slightly above range — reported to facility manager'),
+      (gen_random_uuid(), ins_88, item_ppe,           'Pass', true,  null),
+      (gen_random_uuid(), ins_88, item_exam_rooms,    'Pass', true,  null),
+      (gen_random_uuid(), ins_88, item_sharps,        'Pass', true,  null),
+      (gen_random_uuid(), ins_88, item_autoclave,     'Yes',  true,  null),
+      (gen_random_uuid(), ins_88, item_lab_cal,       'Pass', true,  null),
+      (gen_random_uuid(), ins_88, item_ekg,           'Pass', true,  null);
+    RAISE NOTICE 'Inserted 8 responses for score=88';
   END IF;
 
   IF ins_75 IS NOT NULL THEN
-    INSERT INTO public.inspection_responses (inspection_id, item_id, value, passed, notes) VALUES
-      (ins_75, item_med_fridge,   '50°F', false, 'Door seal may be failing — corrective action raised'),
-      (ins_75, item_vac_fridge,   '38°F', true,  null),
-      (ins_75, item_ppe,          'Pass', true,  null),
-      (ins_75, item_exam_rooms,   'Pass', true,  null),
-      (ins_75, item_sharps,       'Pass', true,  null),
-      (ins_75, item_autoclave,    'Yes',  true,  null),
-      (ins_75, item_lab_cal,      'Fail', false, 'Centrifuge calibration sticker expired 2026-05-20'),
-      (ins_75, item_ekg,          'Pass', true,  null);
+    INSERT INTO public.inspection_responses (id, inspection_id, item_id, value, passed, notes) VALUES
+      (gen_random_uuid(), ins_75, item_med_fridge,   '50°F', false, 'Door seal may be failing — corrective action raised'),
+      (gen_random_uuid(), ins_75, item_vac_fridge,   '38°F', true,  null),
+      (gen_random_uuid(), ins_75, item_ppe,           'Pass', true,  null),
+      (gen_random_uuid(), ins_75, item_exam_rooms,    'Pass', true,  null),
+      (gen_random_uuid(), ins_75, item_sharps,        'Pass', true,  null),
+      (gen_random_uuid(), ins_75, item_autoclave,     'Yes',  true,  null),
+      (gen_random_uuid(), ins_75, item_lab_cal,       'Fail', false, 'Centrifuge calibration sticker expired 2026-05-20'),
+      (gen_random_uuid(), ins_75, item_ekg,           'Pass', true,  null);
+    RAISE NOTICE 'Inserted 8 responses for score=75';
   END IF;
 
   IF ins_62 IS NOT NULL THEN
-    INSERT INTO public.inspection_responses (inspection_id, item_id, value, passed, notes) VALUES
-      (ins_62, item_med_fridge,   '43°F', true,  null),
-      (ins_62, item_vac_fridge,   '40°F', true,  null),
-      (ins_62, item_ppe,          'Fail', false, 'Gloves (S) and N95 masks below reorder threshold'),
-      (ins_62, item_exam_rooms,   'Pass', true,  null),
-      (ins_62, item_sharps,       'Fail', false, 'Container in Exam Room 3 over ¾ full'),
-      (ins_62, item_autoclave,    'Yes',  true,  null),
-      (ins_62, item_lab_cal,      'Fail', false, 'Centrifuge sticker expired 2026-05-15'),
-      (ins_62, item_ekg,          'Pass', true,  null);
+    INSERT INTO public.inspection_responses (id, inspection_id, item_id, value, passed, notes) VALUES
+      (gen_random_uuid(), ins_62, item_med_fridge,   '43°F', true,  null),
+      (gen_random_uuid(), ins_62, item_vac_fridge,   '40°F', true,  null),
+      (gen_random_uuid(), ins_62, item_ppe,           'Fail', false, 'Gloves (S) and N95 masks below reorder threshold'),
+      (gen_random_uuid(), ins_62, item_exam_rooms,    'Pass', true,  null),
+      (gen_random_uuid(), ins_62, item_sharps,        'Fail', false, 'Container in Exam Room 3 over ¾ full'),
+      (gen_random_uuid(), ins_62, item_autoclave,     'Yes',  true,  null),
+      (gen_random_uuid(), ins_62, item_lab_cal,       'Fail', false, 'Centrifuge sticker expired 2026-05-15'),
+      (gen_random_uuid(), ins_62, item_ekg,           'Pass', true,  null);
+    RAISE NOTICE 'Inserted 8 responses for score=62';
   END IF;
 
   IF ins_50 IS NOT NULL THEN
-    INSERT INTO public.inspection_responses (inspection_id, item_id, value, passed, notes) VALUES
-      (ins_50, item_dot_kits,     'Fail', false, 'DOT kits expired 2026-06-01 — emergency replacement ordered'),
-      (ins_50, item_breathalyzer, 'No',   false, 'Last calibrated 2025-05-10, overdue by 1 month'),
-      (ins_50, item_coc_forms,    'Pass', true,  null),
-      (ins_50, item_bwc_logs,     'Yes',  true,  null);
+    INSERT INTO public.inspection_responses (id, inspection_id, item_id, value, passed, notes) VALUES
+      (gen_random_uuid(), ins_50, item_dot_kits,     'Fail', false, 'DOT kits expired 2026-06-01 — emergency replacement ordered'),
+      (gen_random_uuid(), ins_50, item_breathalyzer, 'No',   false, 'Last calibrated 2025-05-10, overdue by 1 month'),
+      (gen_random_uuid(), ins_50, item_coc_forms,    'Pass', true,  null),
+      (gen_random_uuid(), ins_50, item_bwc_logs,     'Yes',  true,  null);
+    RAISE NOTICE 'Inserted 4 responses for score=50';
   END IF;
 
   RAISE NOTICE 'Done. Total inspection_responses: %', (SELECT count(*) FROM public.inspection_responses);
