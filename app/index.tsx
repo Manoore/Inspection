@@ -286,6 +286,7 @@ export default function LandingPage() {
 
         {/* Hero */}
         <View style={{ backgroundColor: BRAND, paddingHorizontal: wide ? 64 : 24, paddingTop: 56, paddingBottom: 72 }}>
+          <View style={{ maxWidth: 1200, alignSelf: "center", width: "100%" }}>
           <View style={{ flexDirection: wide ? "row" : "column", alignItems: wide ? "center" : "stretch", gap: wide ? 48 : 36 }}>
             <View style={{ flex: 1 }}>
               <View style={{ backgroundColor: "rgba(37,99,235,0.35)", borderRadius: 20, paddingHorizontal: 14, paddingVertical: 6, marginBottom: 20, alignSelf: "flex-start" }}>
@@ -317,6 +318,7 @@ export default function LandingPage() {
               </View>
             </View>
           </View>
+          </View>
         </View>
 
         {/* Stats */}
@@ -332,32 +334,38 @@ export default function LandingPage() {
 
         {/* Features grid */}
         {(() => {
-          const cols  = wide ? 4 : 2;
-          const pad   = wide ? 128 : 48;
-          const gap   = 14;
-          const cardW = (width - pad - (cols - 1) * gap) / cols;
+          const cols = wide ? 4 : 2;
+          const rows: typeof FEATURES[] = [];
+          for (let i = 0; i < FEATURES.length; i += cols) rows.push(FEATURES.slice(i, i + cols));
           return (
             <View style={{ paddingHorizontal: wide ? 64 : 24, paddingVertical: 72, backgroundColor: "#EEF2FF" }}>
-              <Text style={{ fontSize: 12, fontWeight: "700", color: ACCENT, letterSpacing: 1.8, textAlign: "center", marginBottom: 10, textTransform: "uppercase" }}>
-                Everything you need
-              </Text>
-              <Text style={{ fontSize: wide ? 36 : 24, fontWeight: "800", color: "#111827", textAlign: "center", marginBottom: 12, lineHeight: wide ? 44 : 32 }}>
-                One platform.{"\n"}Every compliance need covered.
-              </Text>
-              <Text style={{ fontSize: 15, color: "#6B7280", textAlign: "center", lineHeight: 25, marginBottom: 48, maxWidth: 500, alignSelf: "center" }}>
-                From building checklists to exporting audit reports — every tool your operations team needs is already built in.
-              </Text>
-              <View style={{ flexDirection: "row", flexWrap: "wrap", gap }}>
-                {FEATURES.map((f) => (
-                  <View key={f.name} style={{ width: cardW, backgroundColor: "#FFF", borderRadius: 18, padding: 22,
-                    borderWidth: 1, borderColor: "#E0E7FF",
-                    shadowColor: f.color, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 3 }}>
-                    <View style={{ width: 52, height: 52, borderRadius: 16, backgroundColor: `${f.color}14`,
-                      alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-                      <Ionicons name={f.icon} size={24} color={f.color} />
-                    </View>
-                    <Text style={{ fontSize: wide ? 14 : 13, fontWeight: "800", color: "#111827", marginBottom: 8, lineHeight: 20 }}>{f.name}</Text>
-                    <Text style={{ fontSize: wide ? 13 : 12, color: "#6B7280", lineHeight: 19 }}>{f.what}</Text>
+              <View style={{ maxWidth: 1200, alignSelf: "center", width: "100%" }}>
+                <Text style={{ fontSize: 12, fontWeight: "700", color: ACCENT, letterSpacing: 1.8, textAlign: "center", marginBottom: 10, textTransform: "uppercase" }}>
+                  Everything you need
+                </Text>
+                <Text style={{ fontSize: wide ? 36 : 24, fontWeight: "800", color: "#111827", textAlign: "center", marginBottom: 12, lineHeight: wide ? 44 : 32 }}>
+                  One platform.{"\n"}Every compliance need covered.
+                </Text>
+                <Text style={{ fontSize: 15, color: "#6B7280", textAlign: "center", lineHeight: 25, marginBottom: 48, maxWidth: 500, alignSelf: "center" }}>
+                  From building checklists to exporting audit reports — every tool your operations team needs is already built in.
+                </Text>
+                {rows.map((row, ri) => (
+                  <View key={ri} style={{ flexDirection: "row", gap: 14, marginBottom: 14 }}>
+                    {row.map((f) => (
+                      <View key={f.name} style={{ flex: 1, backgroundColor: "#FFF", borderRadius: 18, padding: 22,
+                        borderWidth: 1, borderColor: "#E0E7FF",
+                        shadowColor: f.color, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 3 }}>
+                        <View style={{ width: 52, height: 52, borderRadius: 16, backgroundColor: `${f.color}14`,
+                          alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+                          <Ionicons name={f.icon} size={24} color={f.color} />
+                        </View>
+                        <Text style={{ fontSize: wide ? 14 : 13, fontWeight: "800", color: "#111827", marginBottom: 8, lineHeight: 20 }}>{f.name}</Text>
+                        <Text style={{ fontSize: wide ? 13 : 12, color: "#6B7280", lineHeight: 19 }}>{f.what}</Text>
+                      </View>
+                    ))}
+                    {row.length < cols && [...Array(cols - row.length)].map((_, i) => (
+                      <View key={`gap-${i}`} style={{ flex: 1 }} />
+                    ))}
                   </View>
                 ))}
               </View>
