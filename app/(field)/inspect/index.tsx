@@ -29,6 +29,151 @@ function statusLabel(s: string) {
   return "Pending";
 }
 
+// ── Per-item detail modal ─────────────────────────────────────────────────────
+
+interface InspResponse {
+  id: string; passed: boolean; value: string; notes?: string; photo_url?: string;
+  checklist_items?: { label: string; type: string } | null;
+}
+
+function InspDetailModal({ detail, locName, onClose }: {
+  detail: Inspection | null; locName: string; onClose: () => void;
+}) {
+  const [responses, setResponses] = useState<InspResponse[]>([]);
+  const [fetching,  setFetching]  = useState(false);
+
+  useEffect(() => {
+    if (!detail) return;
+    setFetching(true);
+    supabase.from("inspection_responses")
+      .select("*, checklist_items(label, type)")
+      .eq("inspection_id", detail.id)
+      .then(({ data }) => { setResponses(data ?? []); setFetching(false); });
+  }, [detail?.id]);
+
+  if (!detail) return null;
+  const sc     = detail.score ?? 0;
+  const color  = sc >= 90 ? COLORS.success : sc >= 75 ? COLORS.warning : COLORS.danger;
+  const passed = responses.filter((r) => r.passed).length;
+  const failed = responses.filter((r) => !r.passed).length;
+
+  return (
+    <Modal visible transparent animationType="slide" onRequestClose={onClose}>
+      <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" }}>
+        <View style={{ backgroundColor: "#FFF", borderTopLeftRadius: 24, borderTopRightRadius: 24,
+          maxHeight: "92%", paddingBottom: 36 }}>
+
+          {/* Header */}
+          <View style={{ flexDirection: "row", alignItems: "center", padding: 20,
+            borderBottomWidth: 1, borderBottomColor: COLORS.gray200 }}>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 17, fontWeight: "800", color: COLORS.gray900 }}>Inspection Details</Text>
+              <Text style={{ fontSize: 12, color: COLORS.gray400, marginTop: 2 }}>{locName}</Text>
+            </View>
+            <View style={{ alignItems: "center", marginRight: 14 }}>
+              <Text style={{ fontSize: 24, fontWeight: "800", color }}>{sc}%</Text>
+              <Text style={{ fontSize: 10, color: COLORS.gray400 }}>Score</Text>
+            </View>
+            <TouchableOpacity onPress={onClose}>
+              <Ionicons name="close" size={24} color={COLORS.gray400} />
+            </TouchableOpacity>
+          </View>
+
+          {/* Meta */}
+          <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingVertical: 10, gap: 8 }}>
+            <View style={{ backgroundColor: `${statusColor(detail.status)}14`, borderRadius: 8,
+              paddingHorizontal: 10, paddingVertical: 4 }}>
+              <Text style={{ fontSize: 12, fontWeight: "700", color: statusColor(detail.status) }}>
+                {statusLabel(detail.status)}
+              </Text>
+            </View>
+            <Text style={{ fontSize: 12, color: COLORS.gray400 }}>
+              {new Date(detail.started_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+            </Text>
+            {detail.completed_at && (
+              <Text style={{ fontSize: 12, color: COLORS.gray400 }}>
+                · {Math.round((new Date(detail.completed_at).getTime() - new Date(detail.started_at).getTime()) / 60000)} min
+              </Text>
+            )}
+          </View>
+
+          {/* Summary counts */}
+          <View style={{ flexDirection: "row", paddingHorizontal: 16, gap: 10, marginBottom: 8 }}>
+            {[
+              { n: passed,           label: "Passed", c: COLORS.success },
+              { n: failed,           label: "Failed", c: COLORS.danger  },
+              { n: responses.length, label: "Total",  c: COLORS.brand   },
+            ].map((s) => (
+              <View key={s.label} style={{ flex: 1, backgroundColor: `${s.c}12`,
+                borderRadius: 10, padding: 10, alignItems: "center" }}>
+                <Text style={{ fontSize: 20, fontWeight: "800", color: s.c }}>{s.n}</Text>
+                <Text style={{ fontSize: 11, color: s.c, fontWeight: "600" }}>{s.label}</Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Items */}
+          {fetching ? (
+            <ActivityIndicator color={COLORS.brand} style={{ marginVertical: 28 }} />
+          ) : responses.length === 0 ? (
+            <Text style={{ textAlign: "center", color: COLORS.gray400, margin: 32, fontStyle: "italic" }}>
+              No response data recorded
+            </Text>
+          ) : (
+            <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
+              showsVerticalScrollIndicator={false}>
+              {responses.map((r) => (
+                <View key={r.id} style={{ flexDirection: "row", alignItems: "flex-start", gap: 12,
+                  paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: "#F3F4F6" }}>
+                  <View style={{ width: 32, height: 32, borderRadius: 16, marginTop: 2,
+                    backgroundColor: r.passed ? `${COLORS.success}15` : `${COLORS.danger}15`,
+                    alignItems: "center", justifyContent: "center" }}>
+                    <Ionicons name={r.passed ? "checkmark-circle" : "close-circle"} size={20}
+                      color={r.passed ? COLORS.success : COLORS.danger} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: "600", color: COLORS.gray900, lineHeight: 19 }}>
+                      {r.checklist_items?.label ?? "Unknown item"}
+                    </Text>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 3 }}>
+                      {r.checklist_items?.type ? (
+                        <View style={{ backgroundColor: "#F3F4F6", borderRadius: 5,
+                          paddingHorizontal: 7, paddingVertical: 2 }}>
+                          <Text style={{ fontSize: 10, color: COLORS.gray600, fontWeight: "600" }}>
+                            {r.checklist_items.type.toUpperCase()}
+                          </Text>
+                        </View>
+                      ) : null}
+                      <Text style={{ fontSize: 12, color: COLORS.gray600 }}>{r.value}</Text>
+                    </View>
+                    {r.notes ? (
+                      <Text style={{ fontSize: 12, color: COLORS.gray400, marginTop: 3, fontStyle: "italic" }}>
+                        Note: {r.notes}
+                      </Text>
+                    ) : null}
+                    {r.photo_url ? (
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 3 }}>
+                        <Ionicons name="camera-outline" size={12} color={COLORS.brand} />
+                        <Text style={{ fontSize: 11, color: COLORS.brand }}>Photo attached</Text>
+                      </View>
+                    ) : null}
+                  </View>
+                  {!r.passed && (
+                    <View style={{ backgroundColor: `${COLORS.danger}12`, borderRadius: 6,
+                      paddingHorizontal: 7, paddingVertical: 3, marginTop: 4 }}>
+                      <Text style={{ fontSize: 10, fontWeight: "700", color: COLORS.danger }}>FAIL</Text>
+                    </View>
+                  )}
+                </View>
+              ))}
+            </ScrollView>
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 // ── Hub screen (no locationId) ────────────────────────────────────────────────
 
 function InspectHub() {
@@ -66,82 +211,6 @@ function InspectHub() {
   }, [user]);
 
   useEffect(() => { load(); }, [load]);
-
-  const DetailModal = () => {
-    if (!detail) return null;
-    const locName = locMap[detail.location_id] ?? detail.location_id;
-    const sc = detail.score ?? 0;
-    const color = sc >= 90 ? COLORS.success : sc >= 75 ? COLORS.warning : COLORS.danger;
-    return (
-      <Modal visible transparent animationType="slide" onRequestClose={() => setDetail(null)}>
-        <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" }}>
-          <View style={{ backgroundColor: "#FFF", borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingBottom: 36 }}>
-            <View style={{ flexDirection: "row", alignItems: "center", padding: 20, borderBottomWidth: 1, borderBottomColor: COLORS.gray200 }}>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 17, fontWeight: "800", color: COLORS.gray900 }}>Inspection Details</Text>
-                <Text style={{ fontSize: 12, color: COLORS.gray400, marginTop: 2 }}>{locName}</Text>
-              </View>
-              <TouchableOpacity onPress={() => setDetail(null)}>
-                <Ionicons name="close" size={24} color={COLORS.gray400} />
-              </TouchableOpacity>
-            </View>
-            <View style={{ padding: 20 }}>
-              {/* Score + status */}
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 16, marginBottom: 20 }}>
-                <ScoreRing score={sc} size={72} strokeWidth={8} />
-                <View style={{ flex: 1 }}>
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                    <View style={{
-                      paddingHorizontal: 10, paddingVertical: 4,
-                      backgroundColor: `${statusColor(detail.status)}18`, borderRadius: 8,
-                    }}>
-                      <Text style={{ fontSize: 12, fontWeight: "700", color: statusColor(detail.status) }}>
-                        {statusLabel(detail.status)}
-                      </Text>
-                    </View>
-                  </View>
-                  <Text style={{ fontSize: 13, color: COLORS.gray600 }}>
-                    {new Date(detail.started_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
-                  </Text>
-                  {detail.completed_at && (
-                    <Text style={{ fontSize: 12, color: COLORS.gray400, marginTop: 2 }}>
-                      Duration: {Math.round((new Date(detail.completed_at).getTime() - new Date(detail.started_at).getTime()) / 60000)} min
-                    </Text>
-                  )}
-                </View>
-              </View>
-
-              {/* Stats grid */}
-              <View style={{ flexDirection: "row", gap: 10, marginBottom: 16 }}>
-                {[
-                  { icon: "checkmark-circle-outline" as const, label: "Score", value: `${sc}%`, color },
-                  { icon: "location-outline" as const, label: "Location", value: locName.split("–")[1]?.trim() ?? locName, color: COLORS.brand },
-                  { icon: "time-outline" as const, label: "Started", value: new Date(detail.started_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), color: COLORS.gray600 },
-                ].map((s) => (
-                  <View key={s.label} style={{
-                    flex: 1, backgroundColor: COLORS.surface, borderRadius: 10,
-                    padding: 12, alignItems: "center",
-                  }}>
-                    <Ionicons name={s.icon} size={20} color={s.color} />
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: COLORS.gray900, marginTop: 4 }} numberOfLines={1}>{s.value}</Text>
-                    <Text style={{ fontSize: 10, color: COLORS.gray400, marginTop: 2 }}>{s.label}</Text>
-                  </View>
-                ))}
-              </View>
-
-              <TouchableOpacity
-                onPress={() => setDetail(null)}
-                style={{ backgroundColor: COLORS.brand, borderRadius: 12, paddingVertical: 14, alignItems: "center" }}
-                activeOpacity={0.85}
-              >
-                <Text style={{ color: "#FFF", fontWeight: "700", fontSize: 15 }}>Close</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-    );
-  };
 
   if (loading) {
     return (
@@ -240,7 +309,11 @@ function InspectHub() {
         })}
       </ScrollView>
 
-      <DetailModal />
+      <InspDetailModal
+        detail={detail}
+        locName={locMap[detail?.location_id ?? ""] ?? ""}
+        onClose={() => setDetail(null)}
+      />
     </SafeAreaView>
   );
 }
