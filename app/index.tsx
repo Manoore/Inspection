@@ -263,7 +263,8 @@ function AppSlideshow() {
 
 export default function LandingPage() {
   const { width } = useWindowDimensions();
-  const wide = width >= 960;
+  const wide   = width >= 960;
+  const mobile = width < 500;
 
   return (
     <View style={{ flex: 1, backgroundColor: "#FFF" }}>
@@ -285,56 +286,65 @@ export default function LandingPage() {
       <ScrollView showsVerticalScrollIndicator={false}>
 
         {/* Hero */}
-        <View style={{ backgroundColor: BRAND, paddingHorizontal: wide ? 64 : 24, paddingTop: 56, paddingBottom: 72 }}>
+        <View style={{ backgroundColor: BRAND, paddingHorizontal: wide ? 64 : 20, paddingTop: mobile ? 40 : 56, paddingBottom: mobile ? 48 : 72 }}>
           <View style={{ maxWidth: 1200, alignSelf: "center", width: "100%" }}>
-          <View style={{ flexDirection: wide ? "row" : "column", alignItems: wide ? "center" : "stretch", gap: wide ? 48 : 36 }}>
-            <View style={{ flex: 1 }}>
-              <View style={{ backgroundColor: "rgba(37,99,235,0.35)", borderRadius: 20, paddingHorizontal: 14, paddingVertical: 6, marginBottom: 20, alignSelf: "flex-start" }}>
-                <Text style={{ color: "rgba(255,255,255,0.9)", fontSize: 12, fontWeight: "600", letterSpacing: 0.5 }}>Built for multi-site urgent care & primary care</Text>
+            <View style={{ flexDirection: wide ? "row" : "column", alignItems: wide ? "center" : "stretch", gap: wide ? 48 : 28 }}>
+              <View style={{ flex: 1 }}>
+                <View style={{ backgroundColor: "rgba(37,99,235,0.35)", borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, marginBottom: 16, alignSelf: "flex-start" }}>
+                  <Text style={{ color: "rgba(255,255,255,0.9)", fontSize: mobile ? 11 : 12, fontWeight: "600", letterSpacing: 0.4 }}>Built for multi-site urgent care & primary care</Text>
+                </View>
+                <Text style={{ fontSize: wide ? 48 : mobile ? 26 : 32, fontWeight: "800", color: "#FFF", lineHeight: wide ? 56 : mobile ? 34 : 40, marginBottom: 16 }}>
+                  Inspect Smarter.{"\n"}Train Faster.{"\n"}Operate Better.
+                </Text>
+                <Text style={{ fontSize: mobile ? 14 : 17, color: "rgba(255,255,255,0.72)", lineHeight: mobile ? 22 : 28, marginBottom: 28 }}>
+                  The all-in-one compliance platform for healthcare organizations managing multiple locations, staff certifications, and inspection schedules.
+                </Text>
+                <View style={{ flexDirection: mobile ? "column" : "row", gap: 12 }}>
+                  <TouchableOpacity onPress={() => router.push("/(auth)/contact")}
+                    style={{ backgroundColor: "#FFF", borderRadius: 12, paddingHorizontal: 28, paddingVertical: 14, alignItems: "center" }}
+                    activeOpacity={0.85}>
+                    <Text style={{ color: BRAND, fontWeight: "800", fontSize: 15 }}>Get Started Free →</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => router.push("/(auth)/login")}
+                    style={{ borderWidth: 2, borderColor: "rgba(255,255,255,0.4)", borderRadius: 12, paddingHorizontal: 28, paddingVertical: 14, alignItems: "center" }}
+                    activeOpacity={0.85}>
+                    <Text style={{ color: "#FFF", fontWeight: "700", fontSize: 15 }}>Sign In</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <Text style={{ fontSize: wide ? 48 : 32, fontWeight: "800", color: "#FFF", lineHeight: wide ? 56 : 40, marginBottom: 20 }}>
-                Inspect Smarter.{"\n"}Train Faster.{"\n"}Operate Better.
-              </Text>
-              <Text style={{ fontSize: 17, color: "rgba(255,255,255,0.72)", lineHeight: 28, marginBottom: 32 }}>
-                The all-in-one compliance platform for healthcare organizations managing multiple locations, staff certifications, and inspection schedules.
-              </Text>
-              <View style={{ flexDirection: "row", gap: 12, flexWrap: "wrap" }}>
-                <TouchableOpacity onPress={() => router.push("/(auth)/contact")}
-                  style={{ backgroundColor: "#FFF", borderRadius: 12, paddingHorizontal: 28, paddingVertical: 15, alignItems: "center" }}
-                  activeOpacity={0.85}>
-                  <Text style={{ color: BRAND, fontWeight: "800", fontSize: 15 }}>Get Started Free →</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => router.push("/(auth)/login")}
-                  style={{ borderWidth: 2, borderColor: "rgba(255,255,255,0.4)", borderRadius: 12, paddingHorizontal: 28, paddingVertical: 15, alignItems: "center" }}
-                  activeOpacity={0.85}>
-                  <Text style={{ color: "#FFF", fontWeight: "700", fontSize: 15 }}>Sign In</Text>
-                </TouchableOpacity>
-              </View>
+              {/* Screen preview — hide on mobile to avoid clutter */}
+              {!mobile && (
+                <View style={{ width: wide ? 320 : "100%", maxWidth: 360, alignSelf: "center" }}>
+                  <View style={{ borderRadius: 20, overflow: "hidden", shadowColor: "#000", shadowOffset: { width: 0, height: 20 }, shadowOpacity: 0.25, shadowRadius: 40, elevation: 20 }}>
+                    <ScreenDashboard />
+                  </View>
+                </View>
+              )}
             </View>
-            {/* Hero screen preview */}
-            <View style={{ width: wide ? 320 : "100%", maxWidth: 360, alignSelf: wide ? "auto" : "center" }}>
-              <View style={{ borderRadius: 20, overflow: "hidden", shadowColor: "#000", shadowOffset: { width: 0, height: 20 }, shadowOpacity: 0.25, shadowRadius: 40, elevation: 20 }}>
-                <ScreenDashboard />
-              </View>
-            </View>
-          </View>
           </View>
         </View>
 
         {/* Stats */}
-        <View style={{ backgroundColor: ACCENT, flexDirection: "row", flexWrap: "wrap", justifyContent: "center", paddingVertical: 24 }}>
-          {STATS.map((s, i) => (
-            <View key={s.label} style={{ alignItems: "center", paddingHorizontal: 28, paddingVertical: 8,
-              borderRightWidth: i < STATS.length - 1 ? 1 : 0, borderRightColor: "rgba(255,255,255,0.2)" }}>
-              <Text style={{ fontSize: 26, fontWeight: "800", color: "#FFF" }}>{s.value}</Text>
-              <Text style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", marginTop: 3 }}>{s.label}</Text>
-            </View>
-          ))}
+        <View style={{ backgroundColor: ACCENT, paddingVertical: 24, paddingHorizontal: mobile ? 20 : 0 }}>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center" }}>
+            {STATS.map((s, i) => (
+              <View key={s.label} style={{
+                alignItems: "center", paddingHorizontal: mobile ? 0 : 28, paddingVertical: mobile ? 14 : 8,
+                width: mobile ? "50%" : undefined,
+                borderRightWidth: mobile ? (i % 2 === 0 ? 1 : 0) : (i < STATS.length - 1 ? 1 : 0),
+                borderBottomWidth: mobile && i < 2 ? 1 : 0,
+                borderColor: "rgba(255,255,255,0.2)",
+              }}>
+                <Text style={{ fontSize: mobile ? 28 : 26, fontWeight: "800", color: "#FFF" }}>{s.value}</Text>
+                <Text style={{ fontSize: mobile ? 11 : 12, color: "rgba(255,255,255,0.75)", marginTop: 3, textAlign: "center" }}>{s.label}</Text>
+              </View>
+            ))}
+          </View>
         </View>
 
         {/* Features grid */}
         {(() => {
-          const cols = wide ? 4 : 2;
+          const cols = wide ? 4 : mobile ? 1 : 2;
           const rows: typeof FEATURES[] = [];
           for (let i = 0; i < FEATURES.length; i += cols) rows.push(FEATURES.slice(i, i + cols));
           return (
@@ -352,7 +362,7 @@ export default function LandingPage() {
                 {rows.map((row, ri) => (
                   <View key={ri} style={{ flexDirection: "row", gap: 14, marginBottom: 14 }}>
                     {row.map((f) => (
-                      <View key={f.name} style={{ flex: 1, backgroundColor: "#FFF", borderRadius: 18, padding: 22,
+                      <View key={f.name} style={{ flex: 1, backgroundColor: "#FFF", borderRadius: 18, padding: mobile ? 20 : 22,
                         borderWidth: 1, borderColor: "#E0E7FF",
                         shadowColor: f.color, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 3 }}>
                         <View style={{ width: 52, height: 52, borderRadius: 16, backgroundColor: `${f.color}14`,
