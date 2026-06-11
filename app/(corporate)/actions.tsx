@@ -174,7 +174,8 @@ export default function CorporateActionsScreen() {
 
       {/* Filter tabs */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, gap: 8, paddingBottom: 10 }}>
+        style={{ flexGrow: 0, flexShrink: 0 }}
+        contentContainerStyle={{ paddingHorizontal: 16, gap: 8, paddingTop: 4, paddingBottom: 10 }}>
         {TABS.map((t) => {
           const sel = filter === t.key;
           return (
